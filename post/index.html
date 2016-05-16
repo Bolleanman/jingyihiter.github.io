@@ -88,12 +88,31 @@
     <div class="date">Sun, May 15, 2016</div>
     <div class="title"><a href="http://jingyihiter.github.io/post/first/">my first blog</a></div>
   </header>
-  <div class="body">my first blog view code #include &lt;stdio.h&gt; #include &lt;Windows.h&gt; #include &lt;process.h&gt; #include &lt;string.h&gt; #include &lt;tchar.h&gt; #pragma comment(lib,&quot;Ws2_32.lib&quot;) #define MAXSIZE 65507 //发送数据报文的最大长度 #define HTTP_PORT 80 //http服务器端口 //Http 重要头部数据 struct HttpHeader{ char method[4]; // POST或者GET，注意有些伪CONNECT，本实验暂不考虑 char url[1024]; // 请求的url char host[1024]; // 目标主机 char cookie[1024 * 10]; //cookie HttpHeader(){ ZeroMemory(this, sizeof(HttpHeader)); } }; // HttpCache 缓存中的数据 struct HttpCache{ char url[1024]; char host[1024]; char last_modified[200]; char status[4]; char buffer[MAXSIZE]; HttpCache(){ ZeroMemory(this, sizeof(HttpCache)); } }; //cache中使用到的参数 HttpCache Cache[1024]; int cached_number = 0;//已经缓存的url数 int last_cache = 0;//上一次缓存的索引 //代理相关参数 SOCKET ProxyServer; sockaddr_in ProxyServerAddr; const int ProxyPort = 12345; //网站过滤用到的参数 char acl[1024][1024];//访问控制表 int acl_number = 0;//已经过滤的网站数 //用户过滤用到的参数 char doa_ip[1024][17];//禁止访问的用户的IP,deny of access int ip_number = 0;//已经禁止的用户数 //钓鱼网站用到的网页 char fishing_host[1024][1024];//钓鱼的网站，都重定向到today.hit.edu.cn int host_number = 0; //钓鱼的网站数 //由于新的连接都使用新线程进行处理，对线程的频繁的创建和销毁特别浪费资源 //可以使用线程池技术提高服务器效率 //const int ProxyThreadMaxNum = 20; //HANDLE ProxyThreadHandle[ProxyThreadMaxNum] = {0}; //DWORD ProxyThreadDW[ProxyThreadMaxNum] = {0}; struct ProxyParam{ SOCKET clientSocket; SOCKET serverSocket; }; bool InitSocket(); int ParseHttpHead(char *buffer, HttpHeader *httpHeader); bool ConnectToServer(SOCKET *serverSocket, char *host); unsigned int __stdcall ProxyThread(LPVOID lpParameter); void ParseCache(char *buffer, char *status, char* last_modified); int _tmain(int argc, _TCHAR* argv[]){ printf(&quot;代理服务器正在启动\n&quot;); printf(&quot;初始化...\n&quot;); if (!InitSocket()){ printf(&quot;socket 初始化失败\n&quot;); return -1; } printf(&quot;代理服务器正在运行，监听端口 %d\n&quot;, ProxyPort); SOCKET acceptSocket = INVALID_SOCKET; SOCKADDR_IN acceptAddr; ProxyParam *lpProxyParam; HANDLE hThread; DWORD dwThreadID; char user_ip[16]; //代理服务器不断监听 while (true){ acceptSocket = accept(ProxyServer, (sockaddr*)&amp;acceptAddr, NULL);//在代理服务器上创建新的socket(acceptSocket)与客户通信 printf(&quot;用户的IP：%s\n&quot;, inet_ntoa(acceptAddr.sin_addr)); memcpy(user_ip, inet_ntoa(acceptAddr.sin_addr), 16); //用户过滤 for (int i = 0; i &lt; ip_number; i++){ if (strcmp(user_ip, doa_ip[i]) == 0){ printf(&quot;用户:%s被禁止访问\n&quot;, user_ip); printf(&quot;套接字关闭\n&quot;); closesocket(acceptSocket); continue; } } lpProxyParam = new ProxyParam; if (lpProxyParam == NULL){ continue; } lpProxyParam-&gt;clientSocket = acceptSocket;//acceptSocket作为与客户端连接的socket hThread = (HANDLE)_beginthreadex(NULL, 0, &amp;ProxyThread, (LPVOID)lpProxyParam, 0, 0); //不调用CloseHandle的话会造成内存泄漏 CloseHandle(hThread); Sleep(200); } closesocket(ProxyServer); WSACleanup(); return 0; } //************************************ // Method: InitSocket // FullName: InitSocket // Access: public // Returns: BOOL // Qualifier: 初始化套接字 //************************************ bool InitSocket(){ //加载套接字库（必须） WORD wVersionRequested; WSADATA wsaData; //套接字加载时错误提示 int err; //版本 2.2 wVersionRequested = MAKEWORD(2, 2); //加载 dll 文件 Scoket 库,第一个参数是请求的Socket版本，第二个参数返回请求的Socket的版本信息。 //第一个参数的高位字节指明副版本、低位字节指明主版本 //当一个应用程序调用WSAStartup函数时，操作系统根据请求的Socket版本来搜索相应的Socket库， //然后绑定找到的Socket库到该应用程序中。 //以后应用程序就可以调用所请求的Socket库中的其它Socket函数了。 err = WSAStartup(wVersionRequested, &amp;wsaData); if (err != 0){ //找不到 winsock.dll printf(&quot;加载 winsock 失败，错误代码为: %d\n&quot;, WSAGetLastError()); return FALSE; } //高位字节指明副版本、低位字节指明主版本 if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) { printf(&quot;不能找到正确的 winsock 版本\n&quot;); WSACleanup();//终止Winsock 2 DLL (Ws2_32.dll)的使用.</div>
+  <div class="body">
 
-  
-  <footer>
-    <a href="http://jingyihiter.github.io/post/first/" class="btn btn-default">Read More…</a>
-  </footer>
+<h1 id="my-first-blog:e8fb9c67eba912c72729806db31eaa1b">my first blog</h1>
+
+<p>show image
+<img src="https://github.com/jingyihiter/jingyihiter.github.io/raw/master/images/dog.png" alt="" />
+view code</p>
+
+<pre><code>&lt;article class=&quot;li&quot;&gt;
+  &lt;header&gt;
+    &lt;div class=&quot;date&quot;&gt;{{ with .Site.Params.DateForm }}{{ $.Date.Format . }}{{ else }}{{ $.Date.Format &quot;Mon, Jan 2, 2006&quot; }}{{ end }}&lt;/div&gt;
+    &lt;div class=&quot;title&quot;&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;&lt;/div&gt;
+  &lt;/header&gt;
+  &lt;div class=&quot;body&quot;&gt;{{ if .Truncated }}{{ .Summary }}{{ else }}{{ .Content }}{{ end }}&lt;/div&gt;
+
+  {{ if .Truncated }}
+  &lt;footer&gt;
+    &lt;a href=&quot;{{ .Permalink }}&quot; class=&quot;btn btn-default&quot;&gt;Read More…&lt;/a&gt;
+  &lt;/footer&gt;
+  {{ end }}
+&lt;/article&gt;
+&lt;hr&gt;
+</code></pre>
+</div>
+
   
 </article>
 <hr>
